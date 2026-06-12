@@ -1,3 +1,12 @@
+1.17.5.uvlad.7.1 / 2026-06-12
+-------------------
+
+Fixed:
+* Fix stacked converters in params.
+
+Added:
+* `ffi-llvm-jit` support.
+
 1.17.4 / 2026-03-26
 -------------------
 
