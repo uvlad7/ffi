@@ -133,8 +133,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # s390x also works under QEMU, just slow enough that it's not worth it here
-        arch: [ ppc64le ]
+        arch: [ ppc64le, s390x ]
     runs-on: ubuntu-latest
     name: QEMU (${{ matrix.arch }})
     steps:
