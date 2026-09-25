@@ -130,10 +130,17 @@ jobs:
 
   qemu:
     # https://github.com/uraimo/run-on-arch-action#supported-platforms
+    # armv6/armv7 aren't covered elsewhere: job_fat_binary_multiarch only installs a
+    # precompiled binary gem there, it doesn't build from source and run the specs.
     strategy:
       fail-fast: false
       matrix:
-        arch: [ ppc64le, s390x ]
+        include:
+          - { arch: ppc64le, distro: ubuntu24.04 }
+          - { arch: s390x,   distro: ubuntu24.04 }
+          - { arch: riscv64, distro: ubuntu24.04 }
+          - { arch: armv7,   distro: ubuntu24.04 }
+          - { arch: armv6,   distro: bookworm } # no ubuntu support for armv6
     runs-on: ubuntu-latest
     name: QEMU (${{ matrix.arch }})
     steps:
@@ -143,7 +150,7 @@ jobs:
     - uses: uraimo/run-on-arch-action@v3
       with:
         arch: ${{ matrix.arch }}
-        distro: ubuntu24.04
+        distro: ${{ matrix.distro }}
         githubToken: ${{ github.token }}
         install: |
           apt-get update
