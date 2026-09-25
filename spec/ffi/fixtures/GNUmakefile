@@ -113,6 +113,14 @@ ifeq ($(CPU), powerpc64)
   MODEL = 64
 endif
 
+ifeq ($(CPU), ppc64le)
+  MODEL = 64
+endif
+
+ifeq ($(CPU), powerpc64le)
+  MODEL = 64
+endif
+
 MODELFLAG =
 ifneq ($(MODEL),)
   MODELFLAG = -m$(MODEL)

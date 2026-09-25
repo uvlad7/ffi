@@ -62,28 +62,38 @@ module FFI
 
     CPU = FFI.make_shareable(RbConfig::CONFIG['host_cpu'])
 
-    ARCH = FFI.make_shareable(case CPU.downcase
-    when /amd64|x86_64|x64/
-      "x86_64"
-    when /i\d86|x86|i86pc/
-      "i386"
-    when /ppc64|powerpc64/
-      "powerpc64"
-    when /ppc|powerpc/
-      "powerpc"
-    when /sparcv9|sparc64/
-      "sparcv9"
-    when /arm64|aarch64/  # MacOS calls it "arm64", other operating systems "aarch64"
-      "aarch64"
-    when /^arm/
-      if OS == "darwin"   # Ruby before 3.0 reports "arm" instead of "arm64" as host_cpu on darwin
+    # @param [String] cpu +RbConfig::CONFIG['host_cpu']+-style string to map to an ARCH value
+    # @return [String]
+    # Extracted from the ARCH assignment below so the mapping can be exercised directly in
+    # specs without needing to run on every architecture it handles.
+    def self.arch_for_cpu(cpu)
+      case cpu.downcase
+      when /amd64|x86_64|x64/
+        "x86_64"
+      when /i\d86|x86|i86pc/
+        "i386"
+      when /ppc64le|powerpc64le/
+        "powerpc64le"
+      when /ppc64|powerpc64/
+        "powerpc64"
+      when /ppc|powerpc/
+        "powerpc"
+      when /sparcv9|sparc64/
+        "sparcv9"
+      when /arm64|aarch64/  # MacOS calls it "arm64", other operating systems "aarch64"
         "aarch64"
+      when /^arm/
+        if OS == "darwin"   # Ruby before 3.0 reports "arm" instead of "arm64" as host_cpu on darwin
+          "aarch64"
+        else
+          "arm"
+        end
       else
-        "arm"
+        cpu
       end
-    else
-      RbConfig::CONFIG['host_cpu']
-    end)
+    end
+
+    ARCH = FFI.make_shareable(arch_for_cpu(CPU))
 
     private
     # @param [String) os

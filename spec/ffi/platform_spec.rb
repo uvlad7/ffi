@@ -45,6 +45,23 @@ describe "FFI::Platform::ARCH" do
   end
 end
 
+describe "FFI::Platform.arch_for_cpu" do
+  {
+    "x86_64" => "x86_64", "amd64" => "x86_64", "x64" => "x86_64",
+    "i686" => "i386", "i386" => "i386", "i86pc" => "i386",
+    "powerpc64le" => "powerpc64le", "ppc64le" => "powerpc64le",
+    "powerpc64" => "powerpc64", "ppc64" => "powerpc64",
+    "powerpc" => "powerpc", "ppc" => "powerpc",
+    "sparc64" => "sparcv9", "sparcv9" => "sparcv9",
+    "aarch64" => "aarch64", "arm64" => "aarch64",
+    "s390x" => "s390x",
+  }.each do |cpu, arch|
+    it "maps #{cpu.inspect} to #{arch.inspect}" do
+      expect(FFI::Platform.arch_for_cpu(cpu)).to eq(arch)
+    end
+  end
+end
+
 describe "FFI::Platform::OS" do
   case TestLibrary::OS
   when "linux"
