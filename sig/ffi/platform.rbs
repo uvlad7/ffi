@@ -45,5 +45,6 @@ module FFI
     private
 
     def self.is_os: (String os) -> bool
+    def self.arch_for_cpu: (String cpu) -> String
   end
 end

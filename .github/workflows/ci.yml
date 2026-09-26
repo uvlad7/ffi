@@ -128,6 +128,43 @@ jobs:
       env:
         ITER: 10
 
+  qemu:
+    # https://github.com/uraimo/run-on-arch-action#supported-platforms
+    # armv6/armv7 aren't covered elsewhere: job_fat_binary_multiarch only installs a
+    # precompiled binary gem there, it doesn't build from source and run the specs.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: ppc64le, distro: ubuntu24.04 }
+          - { arch: s390x,   distro: ubuntu24.04 }
+          - { arch: riscv64, distro: ubuntu24.04 }
+          - { arch: armv7,   distro: ubuntu24.04 }
+          - { arch: armv6,   distro: bookworm } # no ubuntu support for armv6
+    runs-on: ubuntu-latest
+    name: QEMU (${{ matrix.arch }})
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - uses: uraimo/run-on-arch-action@v3
+      with:
+        arch: ${{ matrix.arch }}
+        distro: ${{ matrix.distro }}
+        githubToken: ${{ github.token }}
+        install: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ruby ruby-dev ruby-bundler build-essential \
+            autoconf automake libtool libltdl-dev libffi-dev pkg-config git
+        run: |
+          git config --global --add safe.directory '*'
+          ruby --version
+          bundle install
+          bundle exec rake libffi
+          bundle exec rake compile
+          bundle exec rake test FFI_TEST_GC=true
+
   gc_stress:
     if: github.ref == 'refs/heads/master'
     strategy:
